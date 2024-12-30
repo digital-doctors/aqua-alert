@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaAlert</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .remote {
+            background-color: #333;
+            width: 300px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .remote h1 {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .button {
+            background-color: #444;
+            color: white;
+            font-size: 1em;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: inset 0px -3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:active {
+            background-color: #555;
+            box-shadow: inset 0px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .volume {
+            margin-top: 20px;
+            color: white;
+        }
+
+        .volume input {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="remote">
+        <h1>AquaAlert</h1>
+        <div class="buttons">
+            <button class="button" onclick="playSound(1)">Ascend</button>
+            <button class="button" onclick="playSound(2)">Descend</button>
+            <button class="button" onclick="playSound(3)">Distress</button>
+            <button class="button" onclick="playSound(4)">Out of Air</button>
+            <button class="button" onclick="playSound(5)">Custom 1</button>
+            <button class="button" onclick="playSound(6)">Custom 2</button>
+        </div>
+        <div class="volume">
+            <p>Sound Level</p>
+            <label>
+                <input type="radio" name="volume" value="1" checked> Level 1 (Low)
+            </label><br>
+            <label>
+                <input type="radio" name="volume" value="2"> Level 2 (Medium)
+            </label><br>
+            <label>
+                <input type="radio" name="volume" value="3"> Level 3 (High)
+            </label>
+        </div>
+    </div>
+
+    <script>
+        function playSound(button) {
+            const soundFrequencies = {
+                1: 450, // Ascend: A4 (440 Hz)
+                2: 330, // Descend: E4 (330 Hz)
+                3: 550, // Distress: C#5 (550 Hz)
+                4: 200, // Out of Air: G3 (200 Hz)
+                5: 300, // Custom 1
+                6: 700  // Custom 2
+            };
+
+            const volumeLevels = {
+                1: 0.2, // Low
+                2: 0.5, // Medium
+                3: 1.0  // High
+            };
+
+            const selectedVolume = document.querySelector('input[name="volume"]:checked').value;
+            const frequency = soundFrequencies[button];
+            const volume = volumeLevels[selectedVolume];
+
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 1); // Play for 1 second
+        }
+    </script>
+</body>
+</html>
